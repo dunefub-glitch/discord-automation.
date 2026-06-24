@@ -7,7 +7,7 @@ client.on('ready', () => {
 
 client.on('guildMemberAdd', (member) => {
   // Replace YOUR_SERVER_ID with your actual server ID
-  if (member.guild.id === 'YOUR_SERVER_ID') {
+  if (member.guild.id === '1206863130756522025') {
     console.log(`${member.user.tag} joined! Sending request...`);
     
     // This is the command that sends the request
