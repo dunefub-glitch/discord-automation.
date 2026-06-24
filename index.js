@@ -6,7 +6,6 @@ const client = new Client({
   captchaSolver: async function (captcha, UA) {
     console.log("CAPTCHA detected! Sending to CaptchaSonic...");
     try {
-      // CaptchaSonic uses ES Modules, requiring a dynamic import
       const { CaptchaSonic } = await import('captchasonic');
       const solver = new CaptchaSonic({ apiKey: process.env.CAPTCHA_KEY });
 
@@ -19,7 +18,6 @@ const client = new Client({
       });
 
       console.log("CAPTCHA solved successfully.");
-      // CaptchaSonic API structure fallback to ensure the token is passed correctly
       return result.solution?.token || result.solution || result.token;
     } catch (err) {
       console.error("CaptchaSonic failed:", err);
@@ -33,6 +31,10 @@ client.on('ready', () => {
 
 client.on('messageCreate', async (message) => {
   if (message.guild && message.guild.id === TARGET_SERVER_ID) {
+    
+    // Debug: Prints every message the bot can see
+    console.log(`Debug: Saw a message from ${message.author.tag} | Type: ${message.type}`);
+    
     if (message.type === 'USER_JOIN' || message.type === 7) {
       const joinedUser = message.author;
       console.log(`Join detected: ${joinedUser.tag}`);
