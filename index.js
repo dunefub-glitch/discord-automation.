@@ -26,18 +26,19 @@ const client = new Client({
 });
 
 client.on('ready', () => {
-  console.log(`Logged in as ${client.user.tag}! Solver is active.`);
+  console.log(`Logged in as ${client.user.tag}! Broad tracking active.`);
 });
 
 client.on('messageCreate', async (message) => {
+  // Check if the message is from any channel inside your specific server
   if (message.guild && message.guild.id === TARGET_SERVER_ID) {
     
-    // Debug: Prints every message the bot can see
-    console.log(`Debug: Saw a message from ${message.author.tag} | Type: ${message.type}`);
+    // Check for standard system join messages OR if the content/system properties match a join
+    const isSystemJoin = message.type === 'USER_JOIN' || message.type === 7;
     
-    if (message.type === 'USER_JOIN' || message.type === 7) {
+    if (isSystemJoin) {
       const joinedUser = message.author;
-      console.log(`Join detected: ${joinedUser.tag}`);
+      console.log(`System Join detected: ${joinedUser.tag} (ID: ${joinedUser.id})`);
 
       await new Promise(resolve => setTimeout(resolve, 10000));
 
