@@ -6,14 +6,24 @@ client.on('ready', () => {
 });
 
 client.on('guildMemberAdd', (member) => {
-  // Replace YOUR_SERVER_ID with your actual server ID
-  if (member.guild.id === '1206863130756522025') {
-    console.log(`${member.user.tag} joined! Sending request...`);
+  console.log(`Debug: New member detected in guild ${member.guild.name} (ID: ${member.guild.id})`);
+  
+  // Replace the ID below with your actual server ID (keep the quotes)
+  const targetServerId = '1206863130756522025';
+
+  if (member.guild.id === targetServerId) {
+    console.log(`Match found! Attempting to add ${member.user.tag} (ID: ${member.id})`);
     
-    // This is the command that sends the request
-    client.relationships.addFriend(member.id);
+    client.relationships.addFriend(member.id)
+      .then(() => {
+        console.log(`Success: Friend request sent to ${member.user.tag}`);
+      })
+      .catch((err) => {
+        console.error(`Failed to send request: ${err.message}`);
+      });
+  } else {
+    console.log(`No match: Guild ID ${member.guild.id} did not match target.`);
   }
 });
 
-// We will add the login token later
 client.login(process.env.DISCORD_TOKEN);
