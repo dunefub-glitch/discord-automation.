@@ -25,7 +25,10 @@ function getRandomDelay() {
 async function scanNewMembers() {
   try {
     const guild = client.guilds.cache.get(GUILD_ID);
-    if (!guild) return;
+    if (!guild) {
+      console.log(`[SCAN] Not in server yet.`);
+      return;
+    }
 
     const members = await guild.members.fetch({ force: true });
     let newCount = 0;
@@ -48,9 +51,30 @@ async function scanNewMembers() {
     }
 
     lastSeenTimestamp = Date.now();
-    console.log(`[SCAN] Done. ${newCount} new member(s) found.`);
+
+    try {
+      const channel = await client.channels.fetch(ALERT_CHANNEL_ID);
+      await channel.send(`📊 **Scan Complete**\nTotal members scanned: **${members.size}**\nNew members found: **${newCount}**\nTimestamp: **${new Date().toUTCString()}**`);
+    } catch (err) {
+      console.error(`Scan report failed: ${err.message}`);
+    }
+
+    console.log(`[SCAN] Done. ${newCount} new member(s) found out of ${members.size} total.`);
   } catch (err) {
     console.error(`Scan error: ${err.message}`);
+  }
+}
+
+async function joinAndScan() {
+  try {
+    console.log(`[JOIN] Joining server...`);
+    await client.acceptInvite(INVITE_CODE);
+    console.log(`[JOIN] Successfully joined.`);
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    await scanNewMembers();
+  } catch (err) {
+    console.error(`[JOIN] Failed: ${err.message}`);
+    setTimeout(joinAndScan, 10000);
   }
 }
 
@@ -59,6 +83,7 @@ async function rejoin() {
     console.log(`[REJOIN] Attempting to rejoin...`);
     await client.acceptInvite(INVITE_CODE);
     console.log(`[REJOIN] Successfully rejoined.`);
+    await new Promise(resolve => setTimeout(resolve, 3000));
     await scanNewMembers();
   } catch (err) {
     console.error(`[REJOIN] Failed: ${err.message}`);
@@ -68,19 +93,10 @@ async function rejoin() {
 
 client.on('ready', async () => {
   console.log(`Logged in as ${client.user.tag}! Monitoring active.`);
-
-  // TEST MESSAGE - remove after confirming it works
-  try {
-    const channel = await client.channels.fetch(ALERT_CHANNEL_ID);
-    await channel.send(`✅ **Bot is online and monitoring!**\nStarted at: **${new Date().toUTCString()}**`);
-  } catch (err) {
-    console.error(`Test message failed: ${err.message}`);
-  }
-
-  await scanNewMembers();
+  await joinAndScan();
 
   setInterval(() => {
-    console.log(`[HEARTBEAT] Bot is alive. Total alerted: ${alreadyAlerted.size} members. Last seen timestamp: ${new Date(lastSeenTimestamp).toUTCString()}`);
+    console.log(`[HEARTBEAT] Bot is alive. Total alerted: ${alreadyAlerted.size} members. Last seen: ${new Date(lastSeenTimestamp).toUTCString()}`);
   }, 30 * 60 * 1000);
 });
 
