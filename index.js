@@ -33,8 +33,8 @@ const client = new Client({
       });
 
       const data = await response.json();
-      console.log("CAPTCHA solved successfully.");
-      return data.token;
+      console.log("NoneCap response:", JSON.stringify(data));
+      return data.solution?.token || data.token || data.data?.token;
     } catch (err) {
       console.error("NoneCap failed:", err.message || err);
     }
