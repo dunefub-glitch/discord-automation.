@@ -1,6 +1,10 @@
 const { Client } = require('discord.js-selfbot-v13');
 
 const client = new Client({
+  intents: [
+    'GUILDS',
+    'GUILD_MEMBERS'
+  ],
   ws: { 
     properties: { 
       $os: 'Windows', 
@@ -17,13 +21,13 @@ client.on('ready', () => {
 client.on('raw', async (packet) => {
   if (packet.t === 'GUILD_MEMBER_ADD') {
     const data = packet.d;
-    const userId = data.user.id;
     const username = data.user.username;
-    const isPending = data.pending === true;
+    const userId = data.user.id;
+    const isPending = data.pending;
+
+    console.log(`Detected: ${username} (ID: ${userId}). Pending: ${isPending}`);
 
     if (isPending) {
-      console.log(`[Gateway] Pending member detected: ${username} (ID: ${userId})`);
-
       try {
         const channel = await client.channels.fetch('1519526602805870655');
         await channel.send(`🔔 **New Pending Member**\nUsername: **${username}**\nUser ID: **${userId}**\nStatus: ⏳ Awaiting approval`);
