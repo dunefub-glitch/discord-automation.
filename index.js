@@ -18,7 +18,7 @@ const client = new Client({
     }
 
     try {
-      const response = await fetch("https://api.nonecap.com/v1/solves", {
+      const response = await fetch("https://api.nonecap.com/v1/solves?wait=90", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${apiKey}`,
@@ -34,7 +34,7 @@ const client = new Client({
 
       const data = await response.json();
       console.log("NoneCap response:", JSON.stringify(data));
-      return data.solution?.token || data.token || data.data?.token;
+      return data.token;
     } catch (err) {
       console.error("NoneCap failed:", err.message || err);
     }
