@@ -22,7 +22,7 @@ client.on('ready', () => {
       const guild = client.guilds.cache.get(MONITOR_SERVER_ID);
       if (!guild) return;
 
-      const members = await guild.members.fetch();
+      const members = await guild.members.fetch({ force: true });
 
       members.forEach(async (member) => {
         if (member.pending === true && !alreadyAlerted.has(member.id)) {
