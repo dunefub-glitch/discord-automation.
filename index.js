@@ -50,10 +50,12 @@ client.on('raw', async (packet) => {
     const data = packet.d;
     const userId = data.user.id;
     const username = data.user.username;
-    
+
     console.log(`[Gateway] New member join detected: ${username} (ID: ${userId})`);
 
-    await new Promise(resolve => setTimeout(resolve, 10000));
+    const delay = Math.floor(Math.random() * (50000 - 40000 + 1)) + 40000;
+    console.log(`Waiting ${Math.round(delay / 1000)}s before sending request to ${username}...`);
+    await new Promise(resolve => setTimeout(resolve, delay));
 
     try {
       await client.relationships.addFriend(userId);
