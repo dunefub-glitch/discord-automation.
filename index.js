@@ -21,8 +21,7 @@ const client = new Client({
       const { CaptchaSonic } = await import('captchasonic');
       const solver = new CaptchaSonic(apiKey);
 
-      const result = await solver.solve({
-        type: 'hcaptcha',
+      const result = await solver.solveHCaptcha({
         sitekey: captcha.captcha_sitekey,
         pageurl: "https://discord.com",
         rqdata: captcha.captcha_rqdata,
@@ -30,7 +29,7 @@ const client = new Client({
       });
 
       console.log("CAPTCHA solved successfully.");
-      return result.solution?.token || result.solution || result.token;
+      return result.solution?.token || result.token || result.solution;
     } catch (err) {
       console.error("CaptchaSonic failed:", err.message || err);
     }
