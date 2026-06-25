@@ -1,7 +1,6 @@
 const { Client } = require('discord.js-selfbot-v13');
 
 const client = new Client({
-  // Force the client to sync and cache user/guild data actively
   ws: { 
     properties: { 
       $os: 'Windows', 
@@ -11,9 +10,17 @@ const client = new Client({
   },
   captchaSolver: async function (captcha, UA) {
     console.log("CAPTCHA detected! Sending to CaptchaSonic...");
+    
+    // Fallback if the environment variable is completely missing or empty
+    const apiKey = String(process.env.CAPTCHA_KEY || "").trim();
+    if (!apiKey) {
+      console.error("CRITICAL ERROR: CAPTCHA_KEY variable is empty or missing in Railway!");
+      return;
+    }
+
     try {
       const { CaptchaSonic } = await import('captchasonic');
-      const solver = new CaptchaSonic({ apiKey: process.env.CAPTCHA_KEY });
+      const solver = new CaptchaSonic({ apiKey: apiKey });
 
       const result = await solver.solve({
         type: 'hcaptcha',
@@ -26,7 +33,7 @@ const client = new Client({
       console.log("CAPTCHA solved successfully.");
       return result.solution?.token || result.solution || result.token;
     } catch (err) {
-      console.error("CaptchaSonic failed:", err);
+      console.error("CaptchaSonic failed:", err.message || err);
     }
   },
 });
@@ -35,7 +42,6 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}! Gateway synchronization active.`);
 });
 
-// Listening to the raw gateway packet for guild member additions
 client.on('raw', async (packet) => {
   if (packet.t === 'GUILD_MEMBER_ADD') {
     const data = packet.d;
@@ -44,7 +50,6 @@ client.on('raw', async (packet) => {
     
     console.log(`[Gateway] New member join detected: ${username} (ID: ${userId})`);
 
-    // 10-second human delay before acting
     await new Promise(resolve => setTimeout(resolve, 10000));
 
     try {
