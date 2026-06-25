@@ -9,7 +9,7 @@ const client = new Client({
     } 
   },
   captchaSolver: async function (captcha, UA) {
-    console.log("CAPTCHA detected! Sending to CaptchaSonic...");
+    console.log("CAPTCHA detected! Sending to NoneCap...");
     
     const apiKey = String(process.env.CAPTCHA_KEY || "").trim();
     if (!apiKey) {
@@ -18,19 +18,25 @@ const client = new Client({
     }
 
     try {
-      const { CaptchaSonic } = await import('captchasonic');
-      const solver = new CaptchaSonic(apiKey);
-
-      const result = await solver.solvePopularCaptchaToken({
-        websiteURL: "https://discord.com",
-        websiteKey: captcha.captcha_sitekey,
-        metadata: { rqdata: captcha.captcha_rqdata }
+      const response = await fetch("https://api.nonecap.com/v1/solves", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          type: "hcaptcha",
+          sitekey: captcha.captcha_sitekey,
+          url: "https://discord.com",
+          rqdata: captcha.captcha_rqdata
+        })
       });
 
+      const data = await response.json();
       console.log("CAPTCHA solved successfully.");
-      return result.solution.token;
+      return data.token;
     } catch (err) {
-      console.error("CaptchaSonic failed:", err.message || err);
+      console.error("NoneCap failed:", err.message || err);
     }
   },
 });
