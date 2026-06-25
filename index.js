@@ -19,7 +19,6 @@ const client = new Client({
 
     try {
       const { CaptchaSonic } = await import('captchasonic');
-      // Pass the API key string directly into the constructor
       const solver = new CaptchaSonic(apiKey);
 
       const result = await solver.solve({
@@ -50,7 +49,6 @@ client.on('raw', async (packet) => {
     
     console.log(`[Gateway] New member join detected: ${username} (ID: ${userId})`);
 
-    // 10-second human delay before sending request
     await new Promise(resolve => setTimeout(resolve, 10000));
 
     try {
