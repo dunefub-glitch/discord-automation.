@@ -68,7 +68,20 @@ async function rejoin() {
 
 client.on('ready', async () => {
   console.log(`Logged in as ${client.user.tag}! Monitoring active.`);
+
+  // TEST MESSAGE - remove after confirming it works
+  try {
+    const channel = await client.channels.fetch(ALERT_CHANNEL_ID);
+    await channel.send(`✅ **Bot is online and monitoring!**\nStarted at: **${new Date().toUTCString()}**`);
+  } catch (err) {
+    console.error(`Test message failed: ${err.message}`);
+  }
+
   await scanNewMembers();
+
+  setInterval(() => {
+    console.log(`[HEARTBEAT] Bot is alive. Total alerted: ${alreadyAlerted.size} members. Last seen timestamp: ${new Date(lastSeenTimestamp).toUTCString()}`);
+  }, 30 * 60 * 1000);
 });
 
 client.on('raw', async (packet) => {
