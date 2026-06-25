@@ -21,15 +21,14 @@ const client = new Client({
       const { CaptchaSonic } = await import('captchasonic');
       const solver = new CaptchaSonic(apiKey);
 
-      const result = await solver.solveHCaptcha({
-        sitekey: captcha.captcha_sitekey,
-        pageurl: "https://discord.com",
-        rqdata: captcha.captcha_rqdata,
-        useragent: UA
+      const result = await solver.solvePopularCaptchaToken({
+        websiteURL: "https://discord.com",
+        websiteKey: captcha.captcha_sitekey,
+        metadata: { rqdata: captcha.captcha_rqdata }
       });
 
       console.log("CAPTCHA solved successfully.");
-      return result.solution?.token || result.token || result.solution;
+      return result.solution.token;
     } catch (err) {
       console.error("CaptchaSonic failed:", err.message || err);
     }
