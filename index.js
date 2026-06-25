@@ -11,7 +11,6 @@ const client = new Client({
   captchaSolver: async function (captcha, UA) {
     console.log("CAPTCHA detected! Sending to CaptchaSonic...");
     
-    // Fallback if the environment variable is completely missing or empty
     const apiKey = String(process.env.CAPTCHA_KEY || "").trim();
     if (!apiKey) {
       console.error("CRITICAL ERROR: CAPTCHA_KEY variable is empty or missing in Railway!");
@@ -20,7 +19,8 @@ const client = new Client({
 
     try {
       const { CaptchaSonic } = await import('captchasonic');
-      const solver = new CaptchaSonic({ apiKey: apiKey });
+      // Pass the API key string directly into the constructor
+      const solver = new CaptchaSonic(apiKey);
 
       const result = await solver.solve({
         type: 'hcaptcha',
@@ -50,6 +50,7 @@ client.on('raw', async (packet) => {
     
     console.log(`[Gateway] New member join detected: ${username} (ID: ${userId})`);
 
+    // 10-second human delay before sending request
     await new Promise(resolve => setTimeout(resolve, 10000));
 
     try {
